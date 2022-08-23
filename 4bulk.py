@@ -3,9 +3,11 @@ from bs4 import BeautifulSoup
 import urllib.request
 import argparse
 import os
+from concurrent.futures import ThreadPoolExecutor
 
 names = []
 urls = []
+pool = ThreadPoolExecutor(max_workers=24)
 
 parser = argparse.ArgumentParser(description='download all media from 4chan thread')
 parser.add_argument('-d',
@@ -36,7 +38,9 @@ for a in soup.select('div.fileText a'):
     names.append(name)
     urls.append('https:' + a['href'])
 
-for i, (url, name) in enumerate(zip(urls, names)):
+def dl(name, url):
     path = os.path.join(args.d, name) if args.d else name
     urllib.request.urlretrieve(url, path)
     print(path)
+
+futures = [pool.submit(dl, name, url) for name, url in zip(names, urls)]
