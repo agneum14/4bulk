@@ -4,10 +4,11 @@ import urllib.request
 import argparse
 import os
 from concurrent.futures import ThreadPoolExecutor
+import psutil
 
 names = []
 urls = []
-pool = ThreadPoolExecutor(max_workers=24)
+pool = ThreadPoolExecutor(max_workers=psutil.cpu_count())
 
 parser = argparse.ArgumentParser(description='download all media from 4chan thread')
 parser.add_argument('-d',
