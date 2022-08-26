@@ -17,7 +17,7 @@ parser.add_argument('-d',
                     help='download to DIR')
 parser.add_argument('url',
                     type=str,
-                    help='thread url')
+                    help='thread URL')
 args = parser.parse_args()
 
 if args.d:
@@ -31,7 +31,11 @@ if args.d:
             print('error: insufficient permissions to create', args.d)
             exit(0)
 
-page = requests.get(args.url)
+try:
+    page = requests.get(args.url)
+except requests.exceptions.MissingSchema:
+    print("error: invalid URL") 
+    exit(0)
 soup = BeautifulSoup(page.text, 'html.parser')
 
 for a in soup.select('div.fileText a'):
