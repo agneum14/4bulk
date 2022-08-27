@@ -5,6 +5,7 @@ import argparse
 import os
 from concurrent.futures import ThreadPoolExecutor
 import psutil
+import subprocess
 
 names = []
 urls = []
@@ -17,25 +18,38 @@ parser.add_argument('-d',
                     help='download to DIR')
 parser.add_argument('url',
                     type=str,
-                    help='thread URL')
+                    help='thread URL. can enter clipboard or primary to pull\
+                            from either clipboard with xclip')
 args = parser.parse_args()
 
 if args.d:
     if os.path.isfile(args.d):
         print('error:', args.d, 'is a file')
-        exit(0)
+        exit(1)
     elif not os.path.isdir(args.d):
         try:
             os.mkdir(args.d)
         except PermissionError:
             print('error: insufficient permissions to create', args.d)
-            exit(0)
+            exit(2)
+
+if args.url in {'clipboard', 'primary'}:
+    cmd = 'xclip -selection ' + args.url + ' -o'
+    r = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    if r.returncode == 127:
+        print('error: xclip isn\'t installed')
+        exit(3)
+    elif r.stdout == '':
+        print('error: clipboard ' + args.url + ' is empty')
+        exit(4)
+    url = r.stdout
+else: url = args.url
 
 try:
-    page = requests.get(args.url)
+    page = requests.get(url)
 except requests.exceptions.MissingSchema:
-    print("error: invalid URL") 
-    exit(0)
+    print("error: invalid URL")
+    exit(5)
 soup = BeautifulSoup(page.text, 'html.parser')
 
 for a in soup.select('div.fileText a'):
