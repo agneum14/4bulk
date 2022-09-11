@@ -3,11 +3,11 @@ download all media from 4chan thread
 
 ## install
 
-depends on Python 3 packages bs4 and psutil
+depends on Python 3 packages requests and bs4
 
 ```sh
+pip install --user requests
 pip install --user bs4
-pip install --user psutil
 ```
 
 also available in the AUR as ```4bulk-git```
