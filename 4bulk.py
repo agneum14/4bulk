@@ -39,7 +39,7 @@ if args.url in {"clipboard", "primary"}:
         print("error: xclip isn't installed")
         exit(3)
     elif r.stdout == "":
-        print("error: clipboard " + args.url + " is empty")
+        print("error: clipboard {} is empty", args.url)
         exit(4)
     url = r.stdout
 else:
